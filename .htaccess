@@ -1,0 +1,4 @@
+RewriteEngine on
+RewriteBase /decathlon/
+RewriteCond $1 !^(index\.php|img|js|css|robots\.txt|favicon\.ico)
+RewriteRule ^(.*)$ index.php/$1 [L]

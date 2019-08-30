@@ -1,0 +1,14 @@
+.middle-box {
+    width: 100%;
+    max-width: 330px;
+    padding: 15px;
+    margin: auto;
+}
+
+.left-main{
+    max-width:300px;
+}
+
+.active a{
+    color:white;
+}
