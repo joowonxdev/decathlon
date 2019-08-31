@@ -21,8 +21,6 @@ class _Common {
         $user = $this->CI->session->userdata('user');
         $type = $this->CI->session->userdata('type');
 
-
-
         if($url != 'oauth'){
 
             if(!$user){

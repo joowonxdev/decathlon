@@ -7,6 +7,7 @@ use Lcobucci\JWT\Signer\Hmac\Sha256;
 class oauth extends CI_Controller {
     private  $code, $activitiesClientID, $callbackURI, $activitiesClientSecret, $storeClientID, $storeClientSecret ;
 
+
     function __construct()
     {
         parent::__construct();
@@ -133,20 +134,62 @@ class oauth extends CI_Controller {
         }
     }
 
-    private function loginProcess($obj, $exchange = false){
+    private function loginProcess($obj,$tokenEx=null){
 
         $this->load->model('user_model');
 
-        if($this->session->userdata('type') == 'activities' && $exchange){
-            $this->session->set_userdata('type','store');
-            $this->session->unset_userdata('user');
-        }else if($this->session->userdata('type') == 'store' && $exchange){
-            $this->session->set_userdata('type','activities');
-            $this->session->unset_userdata('user');
-        }
-
         $token = (new Parser())->parse($obj->access_token); // Parses from a string
-        if($this->session->userdata('type') == 'activities') {
+        if($tokenEx){ //
+
+            if($obj->scope  == 'joowon:profile') {
+                if ($token->verify(new Sha256(), $this->activitiesClientSecret)) {
+                    $userdata = $this->user_model->getClassUserBYid($token->getClaim('sub'));
+                    if ($userdata) {
+
+                        $userinfo = array('scope' => $obj->scope, 'refresh_token' => $obj->refresh_token, 'access_token' => $obj->access_token, 'id' => $token->getClaim('sub'), 'exp' => $token->getClaim('exp'), 'user_num' => $userdata[0]['user_num'], 'user_id' => $userdata[0]['user_id'], 'user_name' => $userdata[0]['user_name']);
+
+                        $this->session->set_userdata('user', $userinfo);
+                        $this->user_model->updateClassUserLastLoginBYid($userinfo['id']);
+                        if($this->session->userdata('type') == 'activities')
+                            goto_url('/decathlon/activities');
+                        else
+                            goto_url('/decathlon/store');
+                    } else {
+                        $userinfo = array('scope' => $obj->scope, 'refresh_token' => $obj->refresh_token, 'access_token' => $obj->access_token, 'id' => $token->getClaim('sub'), 'exp' => $token->getClaim('exp'));
+                        $this->session->set_userdata('user', $userinfo);
+                        goto_url('/decathlon/oauth/join');
+                    }
+
+                } else {
+                    $this->session->set_flashdata('error', 'access token verify failed');
+                    goto_url('/decathlon/oauth/storelogin');
+                }
+            }else if($obj->scope  == 'joowon:activities'){
+                if ($token->verify(new Sha256(), $this->storeClientSecret)) {
+                    $userdata = $this->user_model->getClassUserBYid($token->getClaim('sub'));
+                    if ($userdata) {
+
+                        $userinfo = array('scope' => $obj->scope, 'refresh_token' => $obj->refresh_token, 'access_token' => $obj->access_token, 'id' => $token->getClaim('sub'), 'exp' => $token->getClaim('exp'), 'user_num' => $userdata[0]['user_num'], 'user_id' => $userdata[0]['user_id'], 'user_name' => $userdata[0]['user_name']);
+
+                        $this->session->set_userdata('user', $userinfo);
+                        $this->user_model->updateClassUserLastLoginBYid($userinfo['id']);
+                        if($this->session->userdata('type') == 'store')
+                            goto_url('/decathlon/store');
+                        else
+                            goto_url('/decathlon/activities');
+                    } else {
+                        $userinfo = array('scope' => $obj->scope, 'refresh_token' => $obj->refresh_token, 'access_token' => $obj->access_token, 'id' => $token->getClaim('sub'), 'exp' => $token->getClaim('exp'));
+                        $this->session->set_userdata('user', $userinfo);
+                        goto_url('/decathlon/oauth/join');
+                    }
+
+                } else {
+                    $this->session->set_flashdata('error', 'access token verify failed');
+                    goto_url('/decathlon/oauth/login');
+                }
+            }
+        }
+        if($this->session->userdata('type')  == 'activities') {
             if ($token->verify(new Sha256(), $this->activitiesClientSecret)) {
                 $userdata = $this->user_model->getClassUserBYid($token->getClaim('sub'));
                 if ($userdata) {
@@ -165,9 +208,9 @@ class oauth extends CI_Controller {
 
             } else {
                 $this->session->set_flashdata('error', 'access token verify failed');
-                goto_url('/decathlon/oauth/login');
+//                goto_url('/decathlon/oauth/login');
             }
-        }else if($this->session->userdata('type') == 'store'){
+        }else if($this->session->userdata('type')  == 'store'){
             if ($token->verify(new Sha256(), $this->storeClientSecret)) {
                 $userdata = $this->user_model->getClassUserBYid($token->getClaim('sub'));
                 if ($userdata) {
@@ -192,6 +235,7 @@ class oauth extends CI_Controller {
     }
     public function tokenExchange(){
         // call api
+
         $user = $this->session->userdata('user');
         if($user) {
             $postData = "grant_type=urn:ietf:params:oauth:grant-type:token-exchange".
@@ -199,6 +243,14 @@ class oauth extends CI_Controller {
                 "&subject_token=".$user['access_token'].
                 "&subject_token_type=urn:ietf:params:oauth:token-type:access_token";
             $obj = request_api($postData);
+
+            if($this->session->userdata('type') == 'activities'){
+                $this->session->set_userdata('type','store');
+                $this->session->unset_userdata('user');
+            }else if($this->session->userdata('type') == 'store'){
+                $this->session->set_userdata('type','activities');
+                $this->session->unset_userdata('user');
+            }
             $this->loginProcess($obj,true);
 
         }else{
