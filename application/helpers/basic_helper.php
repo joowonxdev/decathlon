@@ -86,11 +86,4 @@ function request_api($postData){
     return $obj;
 }
 
-function token_verify($obj){
-    $CI =& get_instance();
-    $token = (new Parser())->parse($obj->access_token);
-    if ($token->verify(new Sha256(), $this->activitiesClientSecret)) {
-
-    }
-}
 ?>

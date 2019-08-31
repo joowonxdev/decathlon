@@ -17,8 +17,9 @@ var sports_cate = function (){
 }
 
 var sports_list = function(data){
-
+    console.log('sport list');
     if($(location).attr('href').match('store') == 'store'){
+        console.log('store');
         $.each(data, function( index, value){
             if(index !== 'type') {
                 $('ul.sport-list').append('<li id="sport-' + value.sport_id + '" class="list-group-item sport-' + value.sport_id + '">' +
@@ -26,6 +27,7 @@ var sports_list = function(data){
             }
         });
     }else if($(location).attr('href').match('activities') == 'activities'){
+        console.log('activities');
         $.each(data, function( index, value){
             if(index !== 'type') {
                 $('ul.sport-list').append('<li id="sport-' + value.sport_id + '" class="list-group-item sport-' + value.sport_id + '">' +

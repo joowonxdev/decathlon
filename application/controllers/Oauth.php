@@ -137,12 +137,11 @@ class oauth extends CI_Controller {
     private function loginProcess($obj,$tokenEx=null){
 
         $this->load->model('user_model');
-
         $token = (new Parser())->parse($obj->access_token); // Parses from a string
-        if($tokenEx){ //
-
+        if($tokenEx){ // from token exchange
             if($obj->scope  == 'joowon:profile') {
                 if ($token->verify(new Sha256(), $this->activitiesClientSecret)) {
+
                     $userdata = $this->user_model->getClassUserBYid($token->getClaim('sub'));
                     if ($userdata) {
 
@@ -165,6 +164,7 @@ class oauth extends CI_Controller {
                     goto_url('/decathlon/oauth/storelogin');
                 }
             }else if($obj->scope  == 'joowon:activities'){
+
                 if ($token->verify(new Sha256(), $this->storeClientSecret)) {
                     $userdata = $this->user_model->getClassUserBYid($token->getClaim('sub'));
                     if ($userdata) {
@@ -190,6 +190,7 @@ class oauth extends CI_Controller {
             }
         }
         if($this->session->userdata('type')  == 'activities') {
+
             if ($token->verify(new Sha256(), $this->activitiesClientSecret)) {
                 $userdata = $this->user_model->getClassUserBYid($token->getClaim('sub'));
                 if ($userdata) {
@@ -208,7 +209,7 @@ class oauth extends CI_Controller {
 
             } else {
                 $this->session->set_flashdata('error', 'access token verify failed');
-//                goto_url('/decathlon/oauth/login');
+                goto_url('/decathlon/oauth/login');
             }
         }else if($this->session->userdata('type')  == 'store'){
             if ($token->verify(new Sha256(), $this->storeClientSecret)) {

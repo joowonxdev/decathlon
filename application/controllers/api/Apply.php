@@ -25,7 +25,7 @@ class apply extends REST_Controller {
     public function index_post(){
 
         if( $this->post('activities_id')){
-            $temp = $this->activitie_model->getClass($this->post('activities_id'));
+            $temp = $this->activitie_model->getClassInfo($this->post('activities_id'));
             $actData = $temp[0];
             $userInfo = $this->session->userdata('user');
             if($actData && $userInfo){

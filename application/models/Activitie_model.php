@@ -24,6 +24,23 @@ class activitie_model extends CI_Model{
         }
     }
 
+    //API call - get
+    public function getClassInfo($activities_id){
+        $this->db->select('activities_id, sport_id, class_name, description, class_price, created_at, updated_at');
+        $this->db->from('activities');
+        $this->db->where('activities_id',$activities_id);
+        $query = $this->db->get();
+
+        if($query->num_rows() == 1)
+        {
+            return $query->result_array();
+        }
+        else
+        {
+            return array('empty');
+        }
+    }
+
     //API call - get list
     public function getClassList($sport_id){
         $this->db->select('activities_id, sport_id, class_name, description, class_price, created_at, updated_at');

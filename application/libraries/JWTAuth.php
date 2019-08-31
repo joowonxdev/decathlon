@@ -4,26 +4,33 @@ require FCPATH.'vendor/autoload.php';
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 
-public class JWTAuth extends \CI_Controller {
+class JWTAuth {
 
-    const storeClientID = '5x8V69v1sRE2ASSGxcyBsA==';
-    const storeClientSecret = 'IEriNd4GZ_aWzwXGO1vDVg==';
+    protected $storeClientID = '5x8V69v1sRE2ASSGxcyBsA==';
+    protected $activitiesClientID = 'NIBFaIO9XQeuVfoSndifUw==';
 
-    const activitiesClientID = 'NIBFaIO9XQeuVfoSndifUw==';
-    const activitiesClientSecret = 'cvIqhb70WAjw2DSr-yjbwA==';
+    private $token ;
 
-    function __construct()
+    public function __construct()
     {
-        parent::__construct();
-        $this->load->library('session');
-
-        $this->storeClientID = '5x8V69v1sRE2ASSGxcyBsA==';
-        $this->storeClientSecret = 'IEriNd4GZ_aWzwXGO1vDVg==';
-        $this->activitiesClientID = 'NIBFaIO9XQeuVfoSndifUw==';
-        $this->activitiesClientSecret = 'cvIqhb70WAjw2DSr-yjbwA==';
-
-        $this->callbackURI = 'http://' . $_SERVER['HTTP_HOST'] . '/decathlon/oauth/callback';
-
-
+        $this->CI = & get_instance();
     }
+
+    function decode($obj){
+        $this->token = (new Parser())->parse($obj->access_token);
+        return $this->token;
+    }
+
+
+    function token_verify($type){
+        if($type == 'activities'){
+            return $this->token->verify(new Sha256(), $this->activitiesClientSecret);
+        }else if($type == 'store'){
+            return $this->token->verify(new Sha256(), $this->storeClientSecret);
+        }else{
+            return false;
+        }
+    }
+
+
 }

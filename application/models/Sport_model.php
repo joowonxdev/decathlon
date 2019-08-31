@@ -37,10 +37,10 @@ class sport_model extends CI_Model{
     }
 
     //API call - get all
-    public function getAllSportsOrder(){
+    public function getAllSportsOrder($user_num){
         $this->db->select('a.sport_id, a.sport_name, a.created_at, a.updated_at');
         $this->db->from('sports a');
-        $this->db->join('apply b', 'a.sport_id = b.sport_id and b.user_num = 1 ', 'left');
+        $this->db->join('apply b', 'a.sport_id = b.sport_id and b.user_num = '.$user_num, 'left');
         $this->db->group_by('a.sport_id');
         $this->db->order_by("(b.sport_id is null)", "asc");
         $this->db->order_by("b.sport_id", "desc");

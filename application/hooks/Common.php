@@ -42,7 +42,7 @@ class _Common {
                         goto_url('/decathlon/oauth/login');
                     }
                 }
-
+                define('USER_NUM', $user['user_num']);
                 define('USER_NAME', $user['user_name']);
                 define("MENU_TOP", true);
                 if($type == 'activities' ){

@@ -14,7 +14,7 @@ class sports extends \REST_Controller {
             $data = $this->sport_model->getSports($sports_id);
         }else{
             if(TITLE == 'STORE'){
-                $data= $this->sport_model->getAllSportsOrder();
+                $data= $this->sport_model->getAllSportsOrder(USER_NUM);
             }else{
                 $data= $this->sport_model->getAllSports();
             }
