@@ -190,53 +190,55 @@ class oauth extends CI_Controller {
                     goto_url('/decathlon/oauth/login');
                 }
             }
-        }
-        if($this->session->userdata('type')  == 'activities') {
+        }else{
+            if($this->session->userdata('type')  == 'activities') {
 
-            if ($token->verify(new Sha256(), $this->activitiesClientSecret)) {
-                $userdata = $this->user_model->getClassUserBYid($token->getClaim('sub'));
-                if ($userdata) {
+                if ($token->verify(new Sha256(), $this->activitiesClientSecret)) {
+                    $userdata = $this->user_model->getClassUserBYid($token->getClaim('sub'));
+                    if ($userdata) {
 
-                    $userinfo = array('scope' => $obj->scope, 'refresh_token' => $obj->refresh_token, 'access_token' => $obj->access_token, 'id' => $token->getClaim('sub'), 'exp' => $token->getClaim('exp'), 'user_num' => $userdata[0]['user_num'], 'user_id' => $userdata[0]['user_id'], 'user_name' => $userdata[0]['user_name']);
+                        $userinfo = array('scope' => $obj->scope, 'refresh_token' => $obj->refresh_token, 'access_token' => $obj->access_token, 'id' => $token->getClaim('sub'), 'exp' => $token->getClaim('exp'), 'user_num' => $userdata[0]['user_num'], 'user_id' => $userdata[0]['user_id'], 'user_name' => $userdata[0]['user_name']);
 
-                    $this->session->set_userdata('user', $userinfo);
-                    $this->user_model->updateClassUserLastLoginBYid($userinfo['id']);
+                        $this->session->set_userdata('user', $userinfo);
+                        $this->user_model->updateClassUserLastLoginBYid($userinfo['id']);
 
-                    goto_url('/decathlon/activities');
+                        goto_url('/decathlon/activities');
+                    } else {
+                        $userinfo = array('scope' => $obj->scope, 'refresh_token' => $obj->refresh_token, 'access_token' => $obj->access_token, 'id' => $token->getClaim('sub'), 'exp' => $token->getClaim('exp'));
+                        $this->session->set_userdata('user', $userinfo);
+                        goto_url('/decathlon/oauth/join');
+                    }
+
                 } else {
-                    $userinfo = array('scope' => $obj->scope, 'refresh_token' => $obj->refresh_token, 'access_token' => $obj->access_token, 'id' => $token->getClaim('sub'), 'exp' => $token->getClaim('exp'));
-                    $this->session->set_userdata('user', $userinfo);
-                    goto_url('/decathlon/oauth/join');
+                    $this->session->set_flashdata('error', 'access token verify failed');
+                    $this->session->unset_userdata('user');
+                    goto_url('/decathlon/oauth/login');
                 }
+            }else if($this->session->userdata('type')  == 'store'){
+                if ($token->verify(new Sha256(), $this->storeClientSecret)) {
+                    $userdata = $this->user_model->getClassUserBYid($token->getClaim('sub'));
+                    if ($userdata) {
 
-            } else {
-                $this->session->set_flashdata('error', 'access token verify failed');
-                $this->session->unset_userdata('user');
-                goto_url('/decathlon/oauth/login');
-            }
-        }else if($this->session->userdata('type')  == 'store'){
-            if ($token->verify(new Sha256(), $this->storeClientSecret)) {
-                $userdata = $this->user_model->getClassUserBYid($token->getClaim('sub'));
-                if ($userdata) {
+                        $userinfo = array('scope' => $obj->scope, 'refresh_token' => $obj->refresh_token, 'access_token' => $obj->access_token, 'id' => $token->getClaim('sub'), 'exp' => $token->getClaim('exp'), 'user_num' => $userdata[0]['user_num'], 'user_id' => $userdata[0]['user_id'], 'user_name' => $userdata[0]['user_name']);
 
-                    $userinfo = array('scope' => $obj->scope, 'refresh_token' => $obj->refresh_token, 'access_token' => $obj->access_token, 'id' => $token->getClaim('sub'), 'exp' => $token->getClaim('exp'), 'user_num' => $userdata[0]['user_num'], 'user_id' => $userdata[0]['user_id'], 'user_name' => $userdata[0]['user_name']);
+                        $this->session->set_userdata('user', $userinfo);
+                        $this->user_model->updateClassUserLastLoginBYid($userinfo['id']);
 
-                    $this->session->set_userdata('user', $userinfo);
-                    $this->user_model->updateClassUserLastLoginBYid($userinfo['id']);
+                        goto_url('/decathlon/store');
+                    } else {
+                        $userinfo = array('scope' => $obj->scope, 'refresh_token' => $obj->refresh_token, 'access_token' => $obj->access_token, 'id' => $token->getClaim('sub'), 'exp' => $token->getClaim('exp'));
+                        $this->session->set_userdata('user', $userinfo);
+                        goto_url('/decathlon/oauth/join');
+                    }
 
-                    goto_url('/decathlon/store');
                 } else {
-                    $userinfo = array('scope' => $obj->scope, 'refresh_token' => $obj->refresh_token, 'access_token' => $obj->access_token, 'id' => $token->getClaim('sub'), 'exp' => $token->getClaim('exp'));
-                    $this->session->set_userdata('user', $userinfo);
-                    goto_url('/decathlon/oauth/join');
+                    $this->session->set_flashdata('error', 'access token verify failed');
+                    $this->session->unset_userdata('user');
+                    goto_url('/decathlon/oauth/storelogin');
                 }
-
-            } else {
-                $this->session->set_flashdata('error', 'access token verify failed');
-                $this->session->unset_userdata('user');
-                goto_url('/decathlon/oauth/storelogin');
             }
         }
+
     }
     public function tokenExchange(){
         // call api
