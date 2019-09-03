@@ -49,14 +49,3 @@ CREATE TABLE IF NOT EXISTS `de_classUser`(
     primary key(`user_num`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
 
-
-CREATE TABLE IF NOT EXISTS `de_storeUser`(
-	`user_num` int(11) not null auto_increment,
-    `user_id` varchar(200) NOT NULL,
-    `user_name` varchar(200) NOT NULL,
-    `id` varchar(200) NOT NULL,
-    `last_login` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    primary key(`user_num`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
-    
