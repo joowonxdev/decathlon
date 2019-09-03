@@ -161,6 +161,7 @@ class oauth extends CI_Controller {
 
                 } else {
                     $this->session->set_flashdata('error', 'access token verify failed');
+                    $this->session->unset_userdata('user');
                     goto_url('/decathlon/oauth/storelogin');
                 }
             }else if($obj->scope  == 'joowon:activities'){
@@ -185,6 +186,7 @@ class oauth extends CI_Controller {
 
                 } else {
                     $this->session->set_flashdata('error', 'access token verify failed');
+                    $this->session->unset_userdata('user');
                     goto_url('/decathlon/oauth/login');
                 }
             }
@@ -209,6 +211,7 @@ class oauth extends CI_Controller {
 
             } else {
                 $this->session->set_flashdata('error', 'access token verify failed');
+                $this->session->unset_userdata('user');
                 goto_url('/decathlon/oauth/login');
             }
         }else if($this->session->userdata('type')  == 'store'){
@@ -230,6 +233,7 @@ class oauth extends CI_Controller {
 
             } else {
                 $this->session->set_flashdata('error', 'access token verify failed');
+                $this->session->unset_userdata('user');
                 goto_url('/decathlon/oauth/storelogin');
             }
         }
